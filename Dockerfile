@@ -30,6 +30,7 @@ RUN apt-get update && apt-get install -y \
 	libtiff5-dev \
 	libtool \
 	pkg-config \
+        vim \
 	wget \
 	xzgv \
 	zlib1g-dev 
@@ -54,7 +55,7 @@ ENV PKG_DIR /home/pkg
 ENV BASE_DIR /home/workspace
 ENV LEP_REPO_URL https://github.com/DanBloomberg/leptonica.git
 ENV LEP_SRC_DIR ${BASE_DIR}/leptonica
-ENV TES_REPO_URL https://github.com/tesseract-ocr/tesseract.git
+ENV TES_REPO_URL https://github.com/quynhdang-vt/tesseract.git
 ENV TES_SRC_DIR ${BASE_DIR}/tesseract
 ENV TESSDATA_PREFIX /usr/local/share/tessdata
 
@@ -65,9 +66,6 @@ RUN mkdir ${TESSDATA_PREFIX}
 
 COPY ./container-scripts/* ${SCRIPTS_DIR}/
 RUN chmod +x ${SCRIPTS_DIR}/*
-RUN ${SCRIPTS_DIR}/repos_clone.sh
 RUN ${SCRIPTS_DIR}/tessdata_download.sh
-
 WORKDIR /home
-
-
+RUN ${SCRIPTS_DIR}/repos_clone.sh && ${SCRIPTS_DIR}/compile_leptonica.sh && ${SCRIPTS_DIR}/compile_tesseract.sh && rm -rf ${LEP_SRC_DIR} && rm -rf ${TES_SRC_DIR} && rm -f /usr/local/lib/liblept.la && rm -f /usr/local/lib/libtesseract.la && apt-get purge --auto-remove -y autoconf build-essential libtool && rm -rf /var/cache/apk/*
